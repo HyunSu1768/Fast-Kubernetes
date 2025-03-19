@@ -43,17 +43,18 @@ sudo sysctl --system
 
 echo "Installing containerd..."
 sudo apt-get install containerd -y
-sudo apt install ca-certificates curl gnupg -y
+
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
   https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
-  | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
+  jammy stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-  | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo apt update
 
 sudo apt update && sudo apt install containerd.io -y
 sudo mkdir -p /etc/containerd
