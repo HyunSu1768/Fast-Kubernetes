@@ -41,17 +41,6 @@ EOF
 
 sudo sysctl --system
 
-echo "Installing containerd..."
-sudo apt-get install containerd -y
-sudo apt update && sudo apt install containerd.io -y
-sudo mkdir -p /etc/containerd
-containerd config default | sudo tee /etc/containerd/config.toml
-# following SystemdCgroup is too important, issue in systemdCgroup, it applies after Ubuntu21.02
-# [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-#  SystemdCgroup = true
-sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml  
-sudo systemctl restart containerd
-
 echo "Installing kubeadm..."
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl
@@ -70,6 +59,17 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docke
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+echo "Installing containerd..."
+sudo apt-get install containerd -y
+sudo apt update && sudo apt install containerd.io -y
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml
+# following SystemdCgroup is too important, issue in systemdCgroup, it applies after Ubuntu21.02
+# [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+#  SystemdCgroup = true
+sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+sudo systemctl restart containerd
 
 cd /etc/docker
 sudo touch /etc/docker/daemon.json
